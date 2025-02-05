@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coin Flipper DApp</title>
+  <script src="https://kit.fontawesome.com/41b9f6317a.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'nonce-myNonceHere';">
+</head>
+<body>
+  <header>
+    <h1>FLIPPER GAME $FLIP</h1>
+    <h2>FLIP CA Address: <span id="copyableText">0xD87EA8e99EA3b85a1375D8A7faaDCb4285Dc601D</span>
+      <button id="copyButton" aria-label="Copy FLIP CA Address">Copy</button>
+    </h2>
+    <select id="langSelector">
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+        <option value="zh">中文</option>
+    </select>
+  </header>
+  <main>
+    <!-- Connect and Disconnect Wallet Buttons -->
+    <button id="connectWallet" aria-label="Connect your wallet to interact with the DApp">Connect Wallet</button>
+    <button id="disconnectWallet" aria-label="Disconnect your wallet from the DApp" style="display:none;">Disconnect Wallet</button>
+
+    <!-- Game Section -->
+    <div id="gameSection">
+      <div id="iframeContainer" style="position: fixed; bottom: 0; right: 0; width: 30%; height: 300px;">
+        <button id="toggleIframe" aria-label="Toggle iframe visibility" style="position: absolute; top: 70px; right: 0;">PulseX</button>
+        <iframe src="https://ipfs.io/ipfs/bafybeift2yakeymqmjmonkzlx2zyc4tty7clkwvg37suffn5bncjx4e6xq" width="100%" height="100%" frameborder="0" style="display: none;"></iframe>
+      </div>
+      <script nonce="myNonceHere">
+        document.getElementById('toggleIframe').addEventListener('click', function() {
+          var iframe = document.querySelector('#iframeContainer iframe');
+          iframe.style.display = iframe.style.display === 'none' ? 'block' : 'none';
+        });
+      </script>
+      <div class="coin" id="coinVisual"></div>
+      <p><strong>Wallet Address:</strong> <span id="walletAddress"></span></p>
+      
+      <p><strong>Your FLIP Balance:</strong> <span id="currentBalanceFLIP">Current FLIP Balance: 0</span></p>
+
+      <!-- Bet Amount Input -->
+      <p><strong>FLIP Amount:</strong> <input type="number" id="betAmount" min="0" step="0.0001" placeholder="Enter FLIP amount" aria-label="Enter your bet amount"></p>
+
+      <!-- Token Approval -->
+      <button id="approveTokens" aria-label="Approve tokens for betting">Approve Tokens</button>
+
+      <!-- Bet Section -->
+      <div id="betSection">
+        <p><strong>Make your Choice:</strong></p>
+        <button id="betHeads" aria-label="Bet on Heads">Heads</button>
+        <button id="betTails" aria-label="Bet on Tails">Tails</button>
+      </div>
+      
+      <!-- Floating Tokens -->
+      <div class="token pulse-logo" style="position: absolute; bottom: 0;"></div>
+      <div class="token flip-logo" style="position: absolute; bottom: 0;"></div>
+      <!-- Add more tokens as needed -->
+    
+      <!-- Odds Display -->
+      <h3>Current Odds: 40/60</h3>
+      <ul id="oddsDisplay"></ul>
+
+      <!-- Leaderboard -->
+      <div id="leaderboardBox">
+        <h3>Historical Stats & Leaderboard:</h3>
+        <ul id="leaderboard"></ul>
+      </div>
+
+      <!-- Result Message -->
+      <p id="resultMessage" class="hidden"></p>
+    </div>
+    
+  </main>
+  <div class="disclaimer">
+    <p>
+        <strong>Disclaimer:</strong> 
+        This application is for entertainment purposes only. Cryptocurrency gambling involves significant risks, including the potential for financial loss. Use at your own risk. 
+        - The use of this application does not guarantee wins or returns on bets placed. 
+        - Blockchain transactions are irreversible; ensure you understand the implications before confirming any transaction. 
+        - Always research and never bet more than you can afford to lose. 
+        - This DApp is not affiliated with, endorsed, or sponsored by any blockchain network or wallet provider. 
+        - The developers of this DApp are not responsible for any losses incurred while using this platform. 
+        - Smart contract interactions should be performed with caution; review contracts on a blockchain explorer before interacting.
+    </p>
+    <p>
+      The National Problem Gambling Helpline in the United States can be reached by calling or texting 1-800-GAMBLER (1-800-426-2537). This hotline provides free, confidential support for individuals struggling with gambling problems or those concerned about a loved one's gambling behavior.
+      For additional resources or if you're looking for help outside the US, there are various helplines and support services available:
+      Gambling Help Online (Australia): 1800 858 858
+      Gamblers Anonymous: They have local chapters with contact numbers worldwide, which can be found on their website.
+      GamCare (UK): 0808 8020 133
+    </p>
+  </div>
+  <rights>
+    <p>&copy; 2025 Coin Flipper DApp. All rights reserved.    Dex Powered by PulseX</p>
+  </rights>
+  <audio id="flipSound">
+    <source src="sounds\587022__fedecortex__2-coin-flip.mp3" type="audio/mpeg">
+  </audio>
+
+  <script nonce="myNonceHere" src="app.js"></script>
+</body>
+</html>

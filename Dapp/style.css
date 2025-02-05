@@ -1,0 +1,408 @@
+/* Reset default styles for consistency */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'seethru'; /* Name you want to use in your CSS */
+    src: url('fonts/seethru.woff2') format('woff2'),
+         url('fonts/seethru.woff') format('woff'),
+         url('fonts/seethru.ttf') format('truetype'); /* Include only the formats you have */
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'extra'; /* Name you want to use in your CSS */
+    src: url('fonts/extra.woff2') format('woff2'),
+         url('fonts/extra.woff') format('woff'),
+         url('fonts/extra.ttf') format('truetype'); /* Include only the formats you have */
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Base styles */
+body {
+    font-family: 'extra', sans-serif;
+    background: linear-gradient(45deg, #3c1c8a, #1a1a1a);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: white;
+    position: relative; /* For floating logos */
+}
+
+@keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.pulse-logo {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-image: url('images/PLSlogo.jpg'); /* Replace with actual path */
+    background-size: cover;
+    opacity: 0.7;
+    border-radius: 50%; /* To make them look more like bubbles */
+}
+
+.flip-logo {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-image: url('images/$FLIP.png'); /* Replace with actual path */
+    background-size: max(40px, 40px);
+    background-position: center;
+    opacity: 1;
+    border-radius: 50%; /* To make them look more like bubbles */
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0);
+    }
+    100% {
+        transform: translate(100vw, 100vh);
+    }
+}
+
+/* Ensure tokens are not stuck at the bottom after animation */
+.pulse-logo {
+    animation-fill-mode: forwards; /* Keeps the final state of the animation */
+}
+
+/* Remove previous floating animations */
+.token {
+    animation: none;
+}
+
+header {
+    background-color: #3c1c8a;
+    color: #ffffff;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+    flex-grow: 1; /* Allows h1 to take up space */
+    text-align: center; /* Centers text within h1 */
+}
+
+header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    flex-grow: 1; /* Allows h1 to take up space */
+    text-align: space-between; /* Centers text within h1 */
+}
+
+header select {
+    margin-left: 10px; /* Adds a small gap between h1 and select */
+    background: #3c1c8a;
+    color: #ffffff;
+    border: 1px solid #3c1c8a;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#copyableText {
+    background-color: #3c1c8a;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: seethru;
+    font-size: 0.9em;
+}
+
+#copyButton {
+    background-color: #ff145a;
+    border: none;
+    color: #3c1c8a;
+    padding: 2px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.8em;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+#copyButton:hover {
+    background-color: #ff145a;
+}
+
+main {
+    /* Make sure main is positioned relative if it isn't already */
+    position: relative;
+    /* Your existing styles */
+    margin: 20px;
+    padding: 20px;
+    background: url('https://keyring.app/wp-content/uploads/2023/05/Pulse-Wallpaper-28-.webp') center/cover no-repeat;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+main::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    /* Remove the following if you don't want any overlay or adjust if you want a different effect */
+    /* background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="5" fill="rgba(255,255,255,0.5)" /></svg>');
+    background-size: 20px 20px; */
+    opacity: 0.2;  /* Adjust this to control how much the background image shows through */
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Wallet Buttons */
+button {
+    background-color: #3c1c8a;
+    color: white;
+    border: 2px solid #ff145a;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease, transform 0.1s; /* 3. Hover Effects on Buttons */
+    font-size: 16px;
+    font-family: seethru;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 5px 0;
+}
+
+button:hover {
+    background-color: #ff145a;
+    border-color: #3c1c8a;
+    transform: translateY(-2px); /* 3. Hover Effects on Buttons */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* 3. Hover Effects on Buttons */
+}
+
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 1. Background Image for the Coin */
+.coin {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background-image: url('images/$FLIP.png'); /* Placeholder for URL input */
+    background-size: cover;
+    background-position: center;
+    border: 3px solid rgb(255, 255, 255);
+    margin: 20px auto;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.coin::before {
+    display: flex;
+    justify-content: bottom;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-image: url('images/PLSlogo.jpg'); /* Placeholder for URL input */
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    font-family: 'seethru', cursive;
+    font-size: 30px;
+    font-weight: normal;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+}
+
+.coin::after {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: transparent;
+    color: #000;
+    font-family: 'seethru', cursive;
+    font-size: 30px;
+    font-weight: normal;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
+    backface-visibility: hidden;
+}
+
+@keyframes flip {
+    0%   { transform: rotateY(0deg); }
+    100% { transform: rotateY(3600deg); /* 10 full rotations in 7 seconds */ }
+}
+
+.coin.flip {
+    animation: flip 7s ease-in-out; /* Duration set to 7 seconds */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    main {
+        margin: 10px;
+        padding: 10px;
+    }
+
+    .coin {
+        width: 120px;
+        height: 120px;
+    }
+
+    .coin::before, .coin::after {
+        font-size: 36px;
+    }
+}
+
+/* Animation for Coin */
+.coin-animation {
+    margin: 2rem 0;
+}
+
+.coin {
+    width: 200px;
+    height: 200px;
+    background: url('images/$FLIP.png');
+    background-size: cover;
+    background-position: center;
+    border: 3px solid white;
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(255, 20, 90, 0.3);
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Section Headers */
+h3 {
+    font-weight: 700;
+    color: white;
+}
+
+/* Leaderboard and Stats */
+ul {
+    list-style: box;
+    padding: 0;
+}
+
+li {
+    background: rgba(400, 400, 400, 0.5);
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    color: black;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background 0.01s;
+}
+
+li:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Result Message */
+#resultMessage {
+    background: #3c1c8a;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-weight: bold;
+    margin-top: 7px;
+    font-size: 15px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Leaderboard Box within the green box, without scroll */
+#leaderboardBox {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: #ff145a(255, 255, 255, 0.9);
+    border: 1px solid #000;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    font-weight: bold;
+    font-size: 15px;
+}
+
+#leaderboard {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+#leaderboard li {
+    margin-bottom: 5px;
+}
+
+.current-player-stats {
+    /* Set specific width */
+    width: 200px;  /* or any pixel value you want */
+    /* OR use relative width */
+    width: 80%;    /* percentage of parent container */
+    
+    /* Add padding for inner spacing */
+    padding: 20px;
+    
+    /* Add margin for outer spacing */
+    margin: 10px auto;  /* centers the box if it's not full width */
+    
+    /* Optional: Add a border and background */
+    border: 1px solid #3c1c8a;
+    border-radius: 8px;
+    background-color: #3c1c8a;
+}
+
+.disclaimer {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.disclaimer p {
+    margin: 0;
+}

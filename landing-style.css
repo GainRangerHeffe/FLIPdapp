@@ -1,0 +1,349 @@
+/* landing-style.css */
+@font-face {
+    font-family: 'seethru';
+    src: url('fonts/seethru.woff2') format('woff2'),
+         url('fonts/seethru.woff') format('woff'),
+         url('fonts/seethru.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'extra';
+    src: url('fonts/extra.woff2') format('woff2'),
+         url('fonts/extra.woff') format('woff'),
+         url('fonts/extra.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+:root {
+    --primary-color: #3c1c8a;
+    --accent-color: #ff145a;
+    --text-color: #ffffff;
+}
+
+body {
+    font-family: 'extra', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(45deg, #3c1c8a, #1a1a1a);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+@keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+header {
+    text-align: center;
+    padding: 2rem 0;
+    background-color: var(--primary-color);
+}
+
+header h1 {
+    font-family: 'extra', sans-serif;
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+header h2 {
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: url('https://keyring.app/wp-content/uploads/2023/05/Pulse-Wallpaper-28-.webp') center/cover no-repeat;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(60, 28, 138, 0.8);
+    z-index: 1;
+}
+
+.hero * {
+    position: relative;
+    z-index: 2;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border: 2px solid var(--accent-color);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: 'seethru', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.button:hover {
+    background-color: var(--accent-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Features Section */
+.features {
+    padding: 4rem 2rem;
+    background-color: rgba(60, 28, 138, 0.9);
+}
+
+.features h3 {
+    font-family: 'seethru', sans-serif;
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 3rem;
+    color: var(--text-color);
+}
+
+.features ul {
+    max-width: 1200px;
+    margin: 0 auto;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.features li {
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    border: 1px solid var(--accent-color);
+}
+
+.features li:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 20, 90, 0.1);
+}
+
+/* Steps Sections */
+.how-it-works, .how-to-get-flip {
+    padding: 4rem 2rem;
+    background-color: rgba(26, 26, 26, 0.9);
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.step {
+    padding: 2rem;
+    background: rgba(60, 28, 138, 0.3);
+    border-radius: 10px;
+    border: 1px solid var(--accent-color);
+    transition: all 0.3s ease;
+}
+
+.step:hover {
+    transform: translateY(-5px);
+    background: rgba(60, 28, 138, 0.5);
+}
+
+.step h4 {
+    color: var(--accent-color);
+    font-family: 'seethru', sans-serif;
+}
+
+/* Community Section */
+.community {
+    padding: 4rem 2rem;
+    background-color: rgba(60, 28, 138, 0.9);
+    text-align: center;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.social-button {
+    padding: 12px 24px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border: 2px solid var(--accent-color);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: 'seethru', sans-serif;
+    text-transform: uppercase;
+}
+
+.social-button:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Trust Section */
+.trust {
+    padding: 4rem 2rem;
+    background-color: rgba(26, 26, 26, 0.9);
+    text-align: center;
+}
+
+.contract-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.contract-box {
+    padding: 2rem;
+    background: rgba(60, 28, 138, 0.3);
+    border-radius: 10px;
+    border: 1px solid var(--accent-color);
+}
+
+.contract-box button {
+    background-color: var(--primary-color);
+    color: white;
+    border: 2px solid var(--accent-color);
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'seethru', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1rem;
+}
+
+.contract-box button:hover {
+    background-color: var(--accent-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* Disclaimer */
+.disclaimer {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-family: 'seethru', sans-serif;
+}
+
+/* Animation for Coin */
+.coin-animation {
+    margin: 2rem 0;
+}
+
+.coin {
+    width: 200px;
+    height: 200px;
+    background: url('images/$FLIP.png');
+    background-size: cover;
+    background-position: center;
+    border: 3px solid white;
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(255, 20, 90, 0.3);
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .hero h2 {
+        font-size: 1.8rem;
+    }
+
+    .features ul {
+        grid-template-columns: 1fr;
+    }
+
+    .social-links {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .coin {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+/* Add this to your landing-style.css */
+.language-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-family: 'seethru', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.language-selector:hover {
+    background-color: var(--accent-color);
+    border-color: var(--primary-color);
+}
+
+header {
+    position: relative; /* For absolute positioning of language selector */
+}
