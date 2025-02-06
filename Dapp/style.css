@@ -55,20 +55,12 @@ body {
     width: 30px;
     height: 30px;
     background-image: url('images/$FLIP.png'); /* Replace with actual path */
-    background-size: max(40px, 40px);
+    background-size: 40px 40px;
     background-position: center;
     opacity: 1;
     border-radius: 50%; /* To make them look more like bubbles */
 }
 
-@keyframes float {
-    0% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(100vw, 100vh);
-    }
-}
 
 /* Ensure tokens are not stuck at the bottom after animation */
 .pulse-logo {
@@ -198,8 +190,8 @@ button:disabled {
 
 /* 1. Background Image for the Coin */
 .coin {
-    width: 250px;
-    height: 250px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     background-image: url('images/$FLIP.png'); /* Placeholder for URL input */
     background-size: cover;
@@ -208,7 +200,8 @@ button:disabled {
     margin: 20px auto;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 20px rgba(255, 20, 90, 0.3);
+    animation: float 3s ease-in-out infinite;
 }
 
 .coin::before {
@@ -281,18 +274,7 @@ button:disabled {
     margin: 2rem 0;
 }
 
-.coin {
-    width: 200px;
-    height: 200px;
-    background: url('images/$FLIP.png');
-    background-size: cover;
-    background-position: center;
-    border: 3px solid white;
-    border-radius: 50%;
-    margin: 0 auto;
-    animation: float 3s ease-in-out infinite;
-    box-shadow: 0 0 20px rgba(255, 20, 90, 0.3);
-}
+
 
 @keyframes float {
     0% {
@@ -305,13 +287,6 @@ button:disabled {
         transform: translateY(0px);
     }
 }
-
-/* Section Headers */
-h3 {
-    font-weight: 700;
-    color: white;
-}
-
 /* Leaderboard and Stats */
 ul {
     list-style: box;
@@ -319,7 +294,7 @@ ul {
 }
 
 li {
-    background: rgba(400, 400, 400, 0.5);
+    background: rgba(255, 255, 255, 0.5);
     margin: 5px 0;
     padding: 10px;
     border-radius: 5px;
@@ -402,17 +377,6 @@ li:hover {
 
 /* Leaderboard Box within the green box, without scroll */
 #leaderboardBox {
-    position: relative; /* Change from absolute to relative */
-    width: 100%;
-    max-width: 300px;
-    margin: 20px auto;
-    background-color: rgba(60, 28, 138, 0.9);
-    border: 1px solid #ff145a;
-    border-radius: 5px;
-    padding: 15px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-#leaderboardBox {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -478,4 +442,44 @@ li:hover {
 
 .disclaimer p {
     margin: 0;
+}
+
+@media (max-width: 600px) {
+
+    #leaderboard {
+
+        font-size: 14px;
+
+        padding: 10px;
+
+    }
+
+
+
+    .current-player-stats, .top-players {
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    .current-player-stats h3, .top-players h3 {
+
+        font-size: 16px;
+
+    }
+    #leaderboardBox {
+        width: 90%;
+        max-width: 300px;
+        padding: 10px;
+    }
+
+
+    .current-player-stats p, .top-players li {
+
+        font-size: 14px;
+
+    }
+
 }
