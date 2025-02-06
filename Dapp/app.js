@@ -11,6 +11,40 @@ let gameContractAddress = "0xD2987B95dBEB4a63C9e206b6CC83b441E5076246"; // Game 
 let lastCheckedBlock = '0';
 const BLOCKS_TO_CHECK = 100;
 
+const numberUtils = {
+    toBigInt(value) {
+        try {
+            if (value === undefined || value === null) return BigInt(0);
+            if (typeof value === 'bigint') return value;
+            if (typeof value === 'number') return BigInt(Math.floor(value));
+            if (typeof value === 'string') {
+                const [whole] = value.split('.');
+                return BigInt(whole || '0');
+            }
+            return BigInt(0);
+        } catch {
+            return BigInt(0);
+        }
+    },
+
+    fromWei(value) {
+        try {
+            const bigIntValue = numberUtils.toBigInt(value);
+            return Number(bigIntValue) / 1e18;
+        } catch {
+            return 0;
+        }
+    },
+
+    toWei(value) {
+        try {
+            return numberUtils.toBigInt(Math.floor(Number(value) * 1e18));
+        } catch {
+            return 0n;
+        }
+    }
+};
+
 function convertBlockchainValue(value) {
     if (value === null || value === undefined) return '0';
     return value.toString();
@@ -1591,70 +1625,36 @@ function toBigInt(value) {
 
 async function checkForNewEvents() {
     try {
-        // Get latest block number and convert to BigInt
-        const latestBlock = toBigInt(await web3.eth.getBlockNumber());
+        const latestBlock = numberUtils.toBigInt(await web3.eth.getBlockNumber());
+        const currentLastChecked = numberUtils.toBigInt(lastCheckedBlock || '0');
+        const blocksToCheck = numberUtils.toBigInt(BLOCKS_TO_CHECK);
         
-        // Convert stored lastCheckedBlock to BigInt, defaulting to 0n if not set
-        const currentLastChecked = toBigInt(lastCheckedBlock || '0');
-        
-        // Calculate fromBlock, ensuring it's a BigInt
-        const blocksToCheck = toBigInt(BLOCKS_TO_CHECK);
         const fromBlock = currentLastChecked === 0n ? 
             (latestBlock - blocksToCheck) : 
             (currentLastChecked + 1n);
-
-        // Ensure fromBlock isn't negative
+        
         const safeFromBlock = fromBlock < 0n ? 0n : fromBlock;
         
-        // Convert block numbers to strings for web3 calls
-        const fromBlockStr = safeFromBlock.toString();
-        const toBlockStr = latestBlock.toString();
-
-        console.log('Block range:', {
-            fromBlock: fromBlockStr,
-            toBlock: toBlockStr,
-            lastCheckedBlock: lastCheckedBlock,
-            latestBlock: latestBlock.toString()
+        const events = await gameContract.getPastEvents('BetPlaced', {
+            fromBlock: safeFromBlock.toString(),
+            toBlock: latestBlock.toString()
         });
 
-        const [betEvents, leaderboardEvents] = await Promise.all([
-            gameContract.getPastEvents('BetPlaced', {
-                fromBlock: fromBlockStr,
-                toBlock: toBlockStr
-            }),
-            gameContract.getPastEvents('LeaderboardUpdated', {
-                fromBlock: fromBlockStr,
-                toBlock: toBlockStr
-            })
-        ]);
-
-        if (betEvents.length > 0 || leaderboardEvents.length > 0) {
-            console.log("New events found:", {
-                betEvents: betEvents.map(event => ({
-                    player: event.returnValues.player,
-                    amount: web3.utils.fromWei(toBigInt(event.returnValues.amount).toString(), 'ether'),
-                    guess: event.returnValues.guess,
-                    outcome: event.returnValues.outcome,
-                    won: event.returnValues.guess === event.returnValues.outcome
-                })),
-                leaderboardEvents: leaderboardEvents.map(event => ({
-                    player: event.returnValues.player,
-                    newWins: toBigInt(event.returnValues.newWins).toString(),
-                    newTotalBet: web3.utils.fromWei(toBigInt(event.returnValues.newTotalBet).toString(), 'ether'),
-                    newGamesPlayed: toBigInt(event.returnValues.newGamesPlayed).toString()
-                }))
-            });
+        if (events.length > 0) {
+            console.log('New events:', events.map(event => ({
+                player: event.returnValues.player,
+                amount: numberUtils.fromWei(event.returnValues.amount),
+                guess: event.returnValues.guess,
+                outcome: event.returnValues.outcome
+            })));
             await fetchLeaderboard();
         }
 
-        // Update lastCheckedBlock as string
         lastCheckedBlock = latestBlock.toString();
-
     } catch (error) {
-        console.error("Error checking for events:", error);
+        console.error('Error checking for events:', error);
     }
 }
-
 // Add a helper function to safely convert values
 function safeNumber(value) {
     try {
