@@ -344,30 +344,103 @@ li:hover {
     margin-top: 7px;
     font-size: 15px;
 }
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
 
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    header h2 {
+        font-size: 1rem;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .coin {
+        width: 150px;
+        height: 150px;
+    }
+
+    .coin::before, .coin::after {
+        font-size: 24px;
+    }
+
+    #copyableText {
+        font-size: 0.8em;
+    }
+
+    #copyButton {
+        font-size: 0.7em;
+    }
+
+    #leaderboardBox {
+        width: 90%;
+        max-width: 300px;
+        padding: 10px;
+    }
+
+    .current-player-stats {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .disclaimer {
+        font-size: 0.7em;
+        padding: 8px;
+    }
+}
 .hidden {
     display: none;
 }
 
 /* Leaderboard Box within the green box, without scroll */
 #leaderboardBox {
+    position: relative; /* Change from absolute to relative */
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto;
+    background-color: rgba(60, 28, 138, 0.9);
+    border: 1px solid #ff145a;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+#leaderboardBox {
     position: absolute;
     top: 20px;
     right: 20px;
-    width: 300px;
-    background-color: #ff145a(255, 255, 255, 0.9);
-    border: 1px solid #000;
+    width: 250px; /* Reduced width */
+    max-width: 100%;
+    background-color: rgba(60, 28, 138, 0.9);
+    border: 1px solid #ff145a;
     border-radius: 5px;
-    padding: 10px;
+    padding: 15px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    font-weight: bold;
-    font-size: 15px;
 }
+@media (max-width: 768px) {
+    #leaderboardBox {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        max-height: 80vh;
+        overflow-y: auto;
+        display: none; /* Hidden by default on mobile */
+    }
 
-#leaderboard {
-    list-style-type: none;
-    padding-left: 0;
-    margin: 0;
+    #leaderboard {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0;
+    }
 }
 
 #leaderboard li {
