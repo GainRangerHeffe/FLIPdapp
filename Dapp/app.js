@@ -1,3 +1,5 @@
+let web3;
+
 // Web3 initialization
 if (typeof window.ethereum !== 'undefined') {
     web3 = new Web3(window.ethereum);
@@ -53,26 +55,9 @@ function convertBlockchainValue(value) {
 // Improved safe number conversion
 function safeNumber(value) {
     try {
-        // Handle undefined/null
-        if (value === undefined || value === null) return 0;
-        
-        // Already a number
-        if (typeof value === 'number') return value;
-        
-        // Handle BigInt
-        if (typeof value === 'bigint') return Number(value);
-        
-        // Handle string values
-        if (typeof value === 'string') {
-            // Remove any decimals for BigInt conversion
-            const [whole] = value.split('.');
-            return Number(whole);
-        }
-        
-        // If it's an object or array, convert to string first
         return Number(value.toString());
     } catch (error) {
-        console.error('Error in safeNumber conversion:', error);
+        console.error("Error converting value:", error);
         return 0;
     }
 }
@@ -1288,7 +1273,7 @@ async function placeBet(isHeads) {
             }
 
             // Determine bet result
-            const didWin = guess === outcome;
+            const didWin = (guess && outcome) || (!guess && !outcome);
             resultMessage.textContent = didWin ? 
                 `Congratulations! You won ${web3.utils.fromWei(amount, 'ether')} FLIP!` : 
                 'Sorry, you lost. Try again!';
@@ -1311,6 +1296,9 @@ async function placeBet(isHeads) {
                 coinElement.classList.remove('flip');
             }, 2000);
         }
+
+        // Ensure leaderboard is updated after a successful bet
+        await fetchLeaderboard();
 
     } catch (error) {
         console.error("Error placing bet:", error);
@@ -1493,16 +1481,16 @@ async function fetchLeaderboard() {
             const playerSection = document.createElement('div');
             playerSection.className = 'current-player-stats';
             const winRate = wins > 0n 
-                ? Number((wins * 100n) / gamesPlayed).toFixed(1)
-                : '0.0';
+            ? Number((wins * 100n) / gamesPlayed).toFixed(1)
+            : '0.0';
 
             playerSection.innerHTML = `
-                <h3>Your Stats</h3>
-                <p>🎮 Games Played: ${gamesPlayed}</p>
-                <p>🏆 Wins: ${wins}</p>
-                <p>📊 Win Rate: ${winRate}%</p>
-                <p>💰 Total FLIP Bet: ${web3.utils.fromWei(totalBet.toString(), 'ether')}</p>
-                <p>🎲 Latest Results: <span id="latestResults"></span></p>
+            <h3>Your Stats</h3>
+            <p>🎮 Games Played: ${gamesPlayed}</p>
+            <p>🏆 Wins: ${wins}</p>
+            <p>📊 Win Rate: ${winRate}%</p>
+            <p>💰 Total FLIP Bet: ${web3.utils.fromWei(totalBet.toString(), 'ether')}</p>
+            <p>🎲 Latest Results: <span id="latestResults"></span></p>
             `;
             leaderboardList.appendChild(playerSection);
 
@@ -1510,31 +1498,24 @@ async function fetchLeaderboard() {
             const latestBlock = Number(await web3.eth.getBlockNumber());
             const fromBlock = Math.max(0, latestBlock - 100);
             const recentBets = await gameContract.getPastEvents('BetPlaced', {
-                filter: { player: currentAccount },
-                fromBlock: fromBlock.toString(),
-                toBlock: latestBlock.toString()
+            filter: { player: currentAccount },
+            fromBlock: fromBlock.toString(),
+            toBlock: latestBlock.toString()
             });
 
             console.log("Recent Bets:", recentBets.map(event => ({
-                amount: web3.utils.fromWei(event.returnValues.amount.toString(), 'ether'),
-                guess: event.returnValues.guess,
-                outcome: event.returnValues.outcome
+            amount: web3.utils.fromWei(event.returnValues.amount.toString(), 'ether'),
+            guess: event.returnValues.guess,
+            outcome: event.returnValues.outcome
             })));
 
-            if (recentBets.length > 0) {
-                const lastBet = recentBets[recentBets.length - 1];
-                const won = lastBet.returnValues.guess === lastBet.returnValues.outcome;
-                const latestResultsSpan = document.getElementById('latestResults');
-                latestResultsSpan.textContent = won ? '🎉 Won!' : '😢 Lost';
-                latestResultsSpan.style.color = won ? 'green' : 'red';
-            }
-
-            // Process recent bets
+            // Process recent bets and show only the top 3 latest results
             const latestResults = document.getElementById('latestResults');
-            latestResults.innerHTML = recentBets.map(event => {
-                const amount = web3.utils.fromWei(event.returnValues.amount.toString(), 'ether');
-                const outcome = event.returnValues.outcome ? 'Win' : 'Lose';
-                return `<p>${amount} FLIP - ${outcome}</p>`;
+            const topRecentBets = recentBets.slice(-3).reverse(); // Get the last 3 bets and reverse to show latest first
+            latestResults.innerHTML = topRecentBets.map(event => {
+            const amount = web3.utils.fromWei(event.returnValues.amount.toString(), 'ether');
+            const outcome = event.returnValues.outcome ? 'Win' : 'Lose';
+            return `<p>${amount} FLIP - ${outcome}</p>`;
             }).join('');
 
             leaderboardList.appendChild(document.createElement('hr'));
@@ -1563,8 +1544,8 @@ async function fetchLeaderboard() {
                 (entry.wins > 0n || entry.gamesPlayed > 0n)
             )
             .sort((a, b) => {
-                if (a.wins !== b.wins) return b.wins > a.wins ? -1 : 1;
-                return b.gamesPlayed > a.gamesPlayed ? -1 : 1;
+                if (a.wins !== b.wins) return b.wins - a.wins;
+                return b.gamesPlayed - a.gamesPlayed;
             })
             .slice(0, 3);
 
@@ -1625,36 +1606,70 @@ function toBigInt(value) {
 
 async function checkForNewEvents() {
     try {
-        const latestBlock = numberUtils.toBigInt(await web3.eth.getBlockNumber());
-        const currentLastChecked = numberUtils.toBigInt(lastCheckedBlock || '0');
-        const blocksToCheck = numberUtils.toBigInt(BLOCKS_TO_CHECK);
-        
+        // Get latest block number and convert to BigInt
+        const latestBlock = BigInt(await web3.eth.getBlockNumber());
+                
+        // Convert stored lastCheckedBlock to BigInt, defaulting to 0n if not set
+        const currentLastChecked = BigInt(lastCheckedBlock || '0');
+                
+        // Calculate fromBlock, ensuring it's a BigInt
+        const blocksToCheck = BigInt(BLOCKS_TO_CHECK);
         const fromBlock = currentLastChecked === 0n ? 
             (latestBlock - blocksToCheck) : 
             (currentLastChecked + 1n);
-        
+
+        // Ensure fromBlock isn't negative
         const safeFromBlock = fromBlock < 0n ? 0n : fromBlock;
         
-        const events = await gameContract.getPastEvents('BetPlaced', {
-            fromBlock: safeFromBlock.toString(),
-            toBlock: latestBlock.toString()
+        // Convert block numbers to strings for web3 calls
+        const fromBlockStr = safeFromBlock.toString();
+        const toBlockStr = latestBlock.toString();
+
+        console.log('Block range:', {
+            fromBlock: fromBlockStr,
+            toBlock: toBlockStr,
+            lastCheckedBlock: lastCheckedBlock,
+            latestBlock: latestBlock.toString()
         });
 
-        if (events.length > 0) {
-            console.log('New events:', events.map(event => ({
-                player: event.returnValues.player,
-                amount: numberUtils.fromWei(event.returnValues.amount),
-                guess: event.returnValues.guess,
-                outcome: event.returnValues.outcome
-            })));
+        const [betEvents, leaderboardEvents] = await Promise.all([
+            gameContract.getPastEvents('BetPlaced', {
+                fromBlock: fromBlockStr,
+                toBlock: toBlockStr
+            }),
+            gameContract.getPastEvents('LeaderboardUpdated', {
+                fromBlock: fromBlockStr,
+                toBlock: toBlockStr
+            })
+        ]);
+
+        if (betEvents.length > 0 || leaderboardEvents.length > 0) {
+            console.log("New events found:", {
+                betEvents: betEvents.map(event => ({
+                    player: event.returnValues.player,
+                    amount: web3.utils.fromWei(toBigInt(event.returnValues.amount).toString(), 'ether'),
+                    guess: event.returnValues.guess,
+                    outcome: event.returnValues.outcome,
+                    won: event.returnValues.guess === event.returnValues.outcome
+                })),
+                leaderboardEvents: leaderboardEvents.map(event => ({
+                    player: event.returnValues.player,
+                    newWins: toBigInt(event.returnValues.newWins).toString(),
+                    newTotalBet: web3.utils.fromWei(toBigInt(event.returnValues.newTotalBet).toString(), 'ether'),
+                    newGamesPlayed: toBigInt(event.returnValues.newGamesPlayed).toString()
+                }))
+            });
             await fetchLeaderboard();
         }
 
+        // Update lastCheckedBlock as string
         lastCheckedBlock = latestBlock.toString();
+
     } catch (error) {
-        console.error('Error checking for events:', error);
+        console.error("Error checking for events:", error);
     }
 }
+
 // Add a helper function to safely convert values
 function safeNumber(value) {
     try {
@@ -1673,12 +1688,18 @@ function setupLeaderboardListener() {
 
     async function checkForNewEvents() {
         try {
-            const latestBlock = await web3.eth.getBlockNumber();
+            const latestBlock = BigInt(await web3.eth.getBlockNumber());
             if (lastCheckedBlock === '0') {
-                lastCheckedBlock = (latestBlock - 1).toString();
+                lastCheckedBlock = (latestBlock - 1n).toString();
             }
 
-            const fromBlockNum = parseInt(lastCheckedBlock) + 1;
+            const fromBlockNum = BigInt(lastCheckedBlock) + 1n;
+
+            if (fromBlockNum > latestBlock) {
+                console.warn("Invalid block range: fromBlock is greater than latestBlock");
+                lastCheckedBlock = latestBlock.toString();
+                return;
+            }
 
             const [betEvents, leaderboardEvents] = await Promise.all([
                 gameContract.getPastEvents('BetPlaced', {
@@ -1710,7 +1731,7 @@ function setupLeaderboardListener() {
                 await fetchLeaderboard();
             }
 
-            lastCheckedBlock = String(latestBlock);
+            lastCheckedBlock = latestBlock.toString();
         } catch (error) {
             console.error("Error checking for events:", error);
         }
@@ -1920,70 +1941,83 @@ document.getElementById('approveTokens').addEventListener('click', async () => {
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
-	if (currentAccount) {
-		await updateBalance();
-		await updateOdds(); 
-	}
-	document.getElementById('betHeads').addEventListener('click', () => placeBet(true));
-	document.getElementById('betTails').addEventListener('click', () => placeBet(false));
+    if (currentAccount) {
+        await updateBalance();
+        await updateOdds(); 
+    }
+    document.getElementById('betHeads').addEventListener('click', () => placeBet(true));
+    document.getElementById('betTails').addEventListener('click', () => placeBet(false));
     await fetchLeaderboard(); // Move fetchLeaderboard here to ensure DOM is fully loaded
 
-	function animateTokens() {
-		const main = document.querySelector('main');
-		const mainRect = main.getBoundingClientRect();
-		
-		const tokens = document.querySelectorAll('.pulse-logo, .flip-logo');
-		tokens.forEach(token => {
-			if (!token.id) {
-				token.id = 'token' + Math.random().toString(36).substring(2, 11);
-			}
-			// Initial random position
-			const randomX = Math.random() * (mainRect.width - 30);
-			const randomY = Math.random() * (mainRect.height - 30);
-			
-			// Set initial position relative to main
-			token.style.position = 'absolute';
-			token.style.left = `${randomX}px`;
-			token.style.top = `${randomY}px`;
-			// Random velocity components
-			const velocity = {
-				x: (Math.random() - 0.5) * 2, // Random value between -1 and 1
-				y: (Math.random() - 0.5) * 2  // Random value between -1 and 1
-			};
-			// Normalize the velocity to ensure consistent speed
-			const speed = 0.5; // Adjust this for slower/faster movement
-			const magnitude = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
-			velocity.x = (velocity.x / magnitude) * speed;
-			velocity.y = (velocity.y / magnitude) * speed;
-			function updatePosition() {
-				const currentX = parseFloat(token.style.left);
-				const currentY = parseFloat(token.style.top);
-				let newX = currentX + velocity.x;
-				let newY = currentY + velocity.y;
-				// Bounce off boundaries
-				if (newX <= 0 || newX >= mainRect.width - 30) {
-					velocity.x *= -1;
-					newX = Math.max(0, Math.min(newX, mainRect.width - 30));
-				}
-				if (newY <= 0 || newY >= mainRect.height - 30) {
-					velocity.y *= -1;
-					newY = Math.max(0, Math.min(newY, mainRect.height - 30));
-				}
-				token.style.left = `${newX}px`;
-				token.style.top = `${newY}px`;
-				requestAnimationFrame(updatePosition);
-			}
-			updatePosition();
-		});
-	}
-	// Start the animation
-	animateTokens();
-	// Handle window resizing
-	let resizeTimeout;
-	window.addEventListener('resize', () => {
-		clearTimeout(resizeTimeout);
-		resizeTimeout = setTimeout(animateTokens, 250); // Debounce resize events
-	});
+    function animateTokens() {
+        const main = document.querySelector('main');
+        const mainRect = main.getBoundingClientRect();
+        
+        const tokens = document.querySelectorAll('.pulse-logo, .flip-logo');
+        tokens.forEach(token => {
+            if (!token.id) {
+                token.id = 'token' + Math.random().toString(36).substring(2, 11);
+            }
+            // Initial random position
+            const randomX = Math.random() * (mainRect.width - 30);
+            const randomY = Math.random() * (mainRect.height - 30);
+            
+            // Set initial position relative to main
+            token.style.position = 'absolute';
+            token.style.left = `${randomX}px`;
+            token.style.top = `${randomY}px`;
+            // Random velocity components
+            const velocity = {
+                x: (Math.random() - 0.5) * 2, // Random value between -1 and 1
+                y: (Math.random() - 0.5) * 2  // Random value between -1 and 1
+            };
+            // Normalize the velocity to ensure consistent speed
+            const speed = 0.5; // Adjust this for slower/faster movement
+            const magnitude = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+            velocity.x = (velocity.x / magnitude) * speed;
+            velocity.y = (velocity.y / magnitude) * speed;
+            function updatePosition() {
+                const currentX = parseFloat(token.style.left);
+                const currentY = parseFloat(token.style.top);
+                let newX = currentX + velocity.x;
+                let newY = currentY + velocity.y;
+                // Bounce off boundaries
+                if (newX <= 0 || newX >= mainRect.width - 30) {
+                    velocity.x *= -1;
+                    newX = Math.max(0, Math.min(newX, mainRect.width - 30));
+                }
+                if (newY <= 0 || newY >= mainRect.height - 30) {
+                    velocity.y *= -1;
+                    newY = Math.max(0, Math.min(newY, mainRect.height - 30));
+                }
+                token.style.left = `${newX}px`;
+                token.style.top = `${newY}px`;
+                requestAnimationFrame(updatePosition);
+            }
+            updatePosition();
+        });
+    }
+    // Start the animation
+    animateTokens();
+    // Handle window resizing
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(animateTokens, 250); // Debounce resize events
+    });
+
+    const langSelector = document.getElementById('langSelector');
+    if (langSelector) {
+        // Set initial language from localStorage or default to 'en'
+        const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+        langSelector.value = savedLang;
+        updateLanguage(savedLang);
+
+        // Add change event listener
+        langSelector.addEventListener('change', (e) => {
+            updateLanguage(e.target.value);
+        });
+    }
 });
 
 document.getElementById('copyButton').addEventListener('click', copyToClipboard);
