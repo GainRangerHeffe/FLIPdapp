@@ -9,7 +9,7 @@ if (typeof window.ethereum !== 'undefined') {
 
 let currentAccount;
 let flipTokenAddress = "0xECAD2D1e7d5932F19B13fB207581AB9033c710C4"; // FLIP token address
-let gameContractAddress = "0x0e0c7ad05BD6F9446e5F92d6F545F71e0c2546f5"; // Game contract address
+let gameContractAddress = "0x9aA381823CA8F9631B4565c8885eCc0a9c269e53"; // Game contract address
 let lastCheckedBlock = '0';
 const BLOCKS_TO_CHECK = 100;
 
